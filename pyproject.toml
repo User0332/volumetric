@@ -1,13 +1,16 @@
 [project]
 name = "volumetric-flask"
 version = "0.1.0"
-description = ""
+description = "The Volumetric Python Web Framework"
 authors = [
     {name = "Carl Furtado",email = "carlzfurtado@gmail.com"}
 ]
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.12,<=3.14"
 dependencies = [
+    "python-jsx (>=0.2.0,<0.3.0)",
+    "flask (>=3.1.1,<4.0.0)",
+    "dotenv (>=0.9.9,<0.10.0)",
 ]
 
 [tool.poetry]
@@ -17,3 +20,7 @@ packages = [{include = "volumetric", from = "src"}]
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+
+[project.scripts]
+volumetric = "volumetric.__main__:main"
