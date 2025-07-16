@@ -1,6 +1,6 @@
 [project]
 name = "volumetric-flask"
-version = "0.1.2"
+version = "1.0.0"
 description = "The Volumetric Python Web Framework"
 authors = [
     {name = "Carl Furtado",email = "carlzfurtado@gmail.com"}
@@ -12,7 +12,6 @@ dependencies = [
     "python-jsx (>=0.2.0,<0.3.0)",
     "flask (>=3.1.1,<4.0.0)",
     "dotenv (>=0.9.9,<0.10.0)",
-    "poetry (>=2.1.3,<3.0.0)",
 ]
 
 [tool.poetry]

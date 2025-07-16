@@ -16,11 +16,13 @@ def run(force_debug: bool):
 		with open("config.json", 'r') as f:
 			conf: dict = load(f)
 
-	sys.path.insert(0, os.getcwd()) # this is needed in case the script was run without `python -m`
-	try: appmod = import_module("app")
-	except ModuleNotFoundError:
+	if not os.path.isfile(f"app.py"):
 		print("app.py file does not exist!")
 		exit(1)
+
+	sys.path.insert(0, os.getcwd()) # this is needed in case the script was run without `python -m`
+
+	appmod = import_module("app")
 	
 	try:
 		app: Flask = appmod.app
@@ -106,15 +108,26 @@ def new(name: str):
 		DEFAULT_ROUTE_CODE
 	)
 
-def route(name: str):
-	if os.path.exists(name): rmtree(name)
+def route(path: str):
+	if not os.path.isdir("root"):
+		print("volumetric route must be called from the app directory!")
+		exit(1)
 
-	os.mkdir(f"{name}")
-	open(f"{name}/config.json", 'w').write(
+	if not path.startswith('/'):
+		print("pathname must start from root path! (/)")
+		exit(1)
+
+	project_path = f"root{path}"
+	
+	if os.path.exists(project_path): rmtree(project_path)
+
+	os.makedirs(project_path)
+
+	open(f"{project_path}/config.json", 'w').write(
 		dumps(DEFAULT_ROUTE_CONF, indent='\t')
 	)
 
-	open(f"{name}/index.py", 'w').write(
+	open(f"{project_path}/index.py", 'w').write(
 		DEFAULT_ROUTE_CODE
 	)
 
