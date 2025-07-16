@@ -1,6 +1,5 @@
 import os
 import sys
-from .fs_routes import parse_fs_routes
 from flask import Flask
 from json import load, dumps
 from shutil import rmtree
@@ -124,46 +123,44 @@ if len(argv) < 2: argv.append('')
 
 def main():
 	parser = ArgumentParser("volumetric", description="CLI for the Volumetric Python web framework (docs: https://DOCS_SUBDOMAIN.readthedocs.io/)")
-	parser.add_argument(
-		"command", 
-		choices=(
-			"run",
-			"new",
-			"route",
-	),
-		help="Possible commands --- volumetric new {projectname} (create a new project) --- volumetric route {routename} (create a new route directory) --- volumetric run (start the application)"
+	
+	subparsers = parser.add_subparsers(dest="command", required=True, help="sub-command help")
+
+	new_parser = subparsers.add_parser(
+		"new",
+		help="Create a new project"
+	)
+	
+	new_parser.add_argument(
+		"name",
+		help="Name to be used for the new project"
 	)
 
-	parser.add_argument("name", help="name to be used for 'new' or 'route' commands", default=None, nargs='?')
+	route_parser = subparsers.add_parser(
+		"route",
+		help="Create a new route directory"
+	)
 
-	parser.add_argument("--force-debug", action="store_true", help="make sure debug mode is used")
+	route_parser.add_argument(
+		"path",
+		help="Name to be used for the new route"
+	)
 
+	run_parser = subparsers.add_parser(
+		"run",
+		help="Run the project"
+	)
+
+	run_parser.add_argument("--force-debug", action="store_true", help="make sure debug mode is used")
 
 	args = parser.parse_args()
-	cmd = args.command
-	name = args.name
 
-	force_debug = args.force_debug
-
-	if cmd == "run":
-		run(force_debug)
-		exit(0)
-
-	if cmd == "new":
-		if not name:
-			print("volumetric: error: expected name to be used with 'new'")
-			exit(1)
-
-		new(name)
-		exit(0)
-
-	if cmd == "route":
-		if not name:
-			print("volumetric: error: expected name to be used with 'route'")
-			exit(1)
-			
-		route(name)
-		exit(0)
+	if args.command == "route":		
+		route(args.path)
+	elif args.command == "new":
+		new(args.name)
+	else:
+		run(args.force_debug)
 
 
 if __name__ == "__main__":
