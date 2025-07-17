@@ -1,4 +1,5 @@
 import os
+import shutil
 import sys
 from flask import Flask
 from json import load, dumps
@@ -34,7 +35,7 @@ def run(force_debug: bool):
 		
 	app.run(**conf)
 
-DEFAULT_ROUTE_CODE = """# coding: jsx
+DEFAULT_SSR_ROUTE_CODE = """# coding: jsx
 
 from pyjsx import jsx
 import volumetric
@@ -50,8 +51,28 @@ def handler(app: volumetric.App, *args):
 	)
 """
 
-DEFAULT_ROUTE_CONF = {
+DEFAULT_CSR_ROUTE_CODE = """from js import *
+from pyjsx import jsx
+from volumetric.xml_helpers import body
+
+def update():
+	return body(
+		<h1 id="heading"></h1>,
+		head=<>
+			<script src="/static/js/index.js" defer></script>
+			<link rel="stylesheet" href="/static/css/index.css"/>
+		</>
+	)
+
+"""
+
+DEFAULT_SSR_ROUTE_CONF = {
 	"methods": ["GET"]
+}
+
+DEFAULT_CSR_ROUTE_CONF = {
+	"methods": ["GET"],
+	"csr": True
 }
 
 DEFAULT_CONF = {
@@ -60,7 +81,6 @@ DEFAULT_CONF = {
 }
 
 DEFAULT_CODE = """from volumetric import App
-import pyjsx.auto_setup
 
 app = App(__name__)
 
@@ -100,15 +120,16 @@ def new(name: str):
 	)
 
 	os.mkdir(f"{name}/root")
+	
 	open(f"{name}/root/config.json", 'w').write(
-		dumps(DEFAULT_ROUTE_CONF, indent='\t')
+		dumps(DEFAULT_SSR_ROUTE_CONF, indent='\t')
 	)
 
 	open(f"{name}/root/index.py", 'w').write(
-		DEFAULT_ROUTE_CODE
+		DEFAULT_SSR_ROUTE_CODE
 	)
 
-def route(path: str):
+def route(path: str, csr: bool):
 	if not os.path.isdir("root"):
 		print("volumetric route must be called from the app directory!")
 		exit(1)
@@ -122,17 +143,27 @@ def route(path: str):
 	if os.path.exists(project_path): rmtree(project_path)
 
 	os.makedirs(project_path)
+	
+	if csr:
+		open(f"{project_path}/config.json", 'w').write(
+			dumps(DEFAULT_CSR_ROUTE_CONF, indent='\t')
+		)
 
-	open(f"{project_path}/config.json", 'w').write(
-		dumps(DEFAULT_ROUTE_CONF, indent='\t')
-	)
+		open(f"{project_path}/index.py", 'w').write(
+			DEFAULT_CSR_ROUTE_CODE
+		)	
+	else:
+		open(f"{project_path}/config.json", 'w').write(
+			dumps(DEFAULT_SSR_ROUTE_CONF, indent='\t')
+		)
 
-	open(f"{project_path}/index.py", 'w').write(
-		DEFAULT_ROUTE_CODE
-	)
+		open(f"{project_path}/index.py", 'w').write(
+			DEFAULT_SSR_ROUTE_CODE
+		)
 
-if len(argv) < 2: argv.append('')
-
+def cleancsr():
+	shutil.rmtree("static/_python")
+	print("Removed static/_python/")
 
 def main():
 	parser = ArgumentParser("volumetric", description="CLI for the Volumetric Python web framework (docs: https://DOCS_SUBDOMAIN.readthedocs.io/)")
@@ -159,6 +190,12 @@ def main():
 		help="Name to be used for the new route"
 	)
 
+	route_parser.add_argument(
+		"--csr",
+		help="Make this route client-side rendered",
+		action="store_true"
+	)
+
 	run_parser = subparsers.add_parser(
 		"run",
 		help="Run the project"
@@ -166,13 +203,20 @@ def main():
 
 	run_parser.add_argument("--force-debug", action="store_true", help="make sure debug mode is used")
 
+	clearcsr_parser = subparsers.add_parser(
+		"cleancsr",
+		help="Clean Python files generated at startup for CSR"
+	)
+
 	args = parser.parse_args()
 
 	if args.command == "route":		
-		route(args.path)
+		route(args.path, args.csr)
 	elif args.command == "new":
 		new(args.name)
-	else:
+	elif args.command == "cleancsr":
+		cleancsr()
+	elif args.command == "run":
 		run(args.force_debug)
 
 if __name__ == "__main__":

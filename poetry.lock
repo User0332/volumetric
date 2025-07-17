@@ -180,6 +180,19 @@ files = [
 ]
 
 [[package]]
+name = "pyodide-py"
+version = "0.27.7"
+description = "A Python package providing core interpreter functionality for Pyodide"
+optional = true
+python-versions = ">=3.12"
+groups = ["main"]
+markers = "extra == \"csr\""
+files = [
+    {file = "pyodide_py-0.27.7-py3-none-any.whl", hash = "sha256:2fa7db63a14720e548eb6174d492643424f8b5f21d43b7c9fecb6d712187fe6a"},
+    {file = "pyodide_py-0.27.7.tar.gz", hash = "sha256:afb68f8abf503f691a4ab5d2ffdbf6dd05117920508e1161e04a34737c649d36"},
+]
+
+[[package]]
 name = "python-dotenv"
 version = "1.1.1"
 description = "Read key-value pairs from a .env file and set them as environment variables"
@@ -210,6 +223,22 @@ files = [
 dev = ["build", "pyright", "pytest", "pytest-cov", "pytest-snapshot", "ruff", "uv"]
 
 [[package]]
+name = "webtypy"
+version = "0.1.7"
+description = "This module contains the DOM types for the majority of the web APIs used in a web browser. These can be used by an IDE to give type hinting and completion during the development using DOM apis."
+optional = true
+python-versions = "*"
+groups = ["main"]
+markers = "extra == \"csr\""
+files = [
+    {file = "webtypy-0.1.7-py3-none-any.whl", hash = "sha256:f35e6d73a4e08783e23adfac271a11cda3a2bd1105499db70e4819244efed0ae"},
+    {file = "webtypy-0.1.7.tar.gz", hash = "sha256:1b7212719a949c802f3d60fac5f0d952eb503a92121409cf1ad9847d7c76a336"},
+]
+
+[package.extras]
+dev = ["build (==0.6.0.post1)", "twine (==3.4.2)", "wheel (==0.37.0)"]
+
+[[package]]
 name = "werkzeug"
 version = "3.1.3"
 description = "The comprehensive WSGI web application library."
@@ -227,7 +256,10 @@ MarkupSafe = ">=2.1.1"
 [package.extras]
 watchdog = ["watchdog (>=2.3)"]
 
+[extras]
+csr = ["pyodide-py", "webtypy"]
+
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.12,<=3.14"
-content-hash = "a6294798aa50c727f09bbef86358a9cc5d8375e64136653b98319eb181634630"
+content-hash = "820d8dfef2951a61a6ab616bf045004c35b3b68a9c75033830f8c4a970b6c3a1"

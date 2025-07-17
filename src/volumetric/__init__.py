@@ -1,3 +1,4 @@
+import pyjsx.auto_setup
 import os
 import typing as t
 import dotenv

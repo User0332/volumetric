@@ -6,6 +6,8 @@ import sys
 from types import FunctionType
 from flask import Flask
 
+from volumetric import csr
+
 def appbind(func: FunctionType, app: Flask, name: str):
 	new = partial(func, app)
 	new.__name__ = name
@@ -25,37 +27,41 @@ def modularize_index(path: str):
 	
 
 def parse_fs_routes(app: Flask, rootdir: str, parent: str='/') -> bool:
-	conf = f"{rootdir}/config.json"
+	conf_fname = f"{rootdir}/config.json"
 	index_fname = f"{rootdir}/index.py"
 	
-	if os.path.exists(conf):
-		with open(conf, 'r') as f:
+	if os.path.exists(conf_fname):
+		with open(conf_fname, 'r') as f:
 			try: config: dict = json.load(f)
 			except json.decoder.JSONDecodeError:
-				print(f"{conf} is invaliZd!")
+				print(f"{conf_fname} is invalid!")
 				return False
 	else: config = {}
 
 	if os.path.exists(index_fname):
-		try:
-			index = modularize_index(index_fname)
-		except Exception as e:
-			print(f"{index_fname} threw an error!\n{e}")
-			return False
+		if config.get("csr") is True:
+			handler = csr.route_to_view(open(index_fname).read(), parent)
+			del config["csr"]
+		else:
+			try:
+				index = modularize_index(index_fname)
+			except Exception as e:
+				print(f"{index_fname} threw an error!\n{e}")
+				return False
 
-		if not hasattr(index, "handler"):
-			print(f"{index_fname} is missing a handler function!")
-			return False
+			if not hasattr(index, "handler"):
+				print(f"{index_fname} is missing a handler function!")
+				return False
+			
+			handler = appbind(
+				index.handler,
+				app,
+				f"{parent}_handler"
+			)
 
-		handler = appbind(
-			index.handler,
-			app,
-			f"{parent}_handler"
-		)
+			del sys.modules["index"]
 
 		app.route(parent, **config)(handler)
-
-		del sys.modules["index"]
 
 	for subdir in os.listdir(rootdir):
 		sub_qual = f"{rootdir}/{subdir}"
