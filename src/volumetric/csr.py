@@ -1,7 +1,7 @@
 import os
 from types import FunctionType
 
-PYODIDE_VERSION = "0.27.7"
+from .constants import PYODIDE_VERSION
 
 def route_to_view(code: str, route: str) -> FunctionType:
 	frontend_header = """import micropip
@@ -38,23 +38,44 @@ import pyjsx.auto_setup
 				
 				await pyodide.loadPackage("micropip")
 
-				const resource = await fetch("{py_residence}");
+				const resource = await fetch("/{py_residence}");
 				const code = await resource.text();
 				const update = await pyodide.runPythonAsync(code);
 
-				console.log("...");
+				console.log("volumetric: starting render");
 
-				const volumetric = pyodide.pyimport("volumetric");
+				document.body.innerHTML = update();
 
-				console.log("done!");
+				const renderWorker = new Worker("/static/js/render-worker.js", {{ type: "module" }});
+
+				renderWorker.onmessage = (ev) => {{
+					if (ev.data === "ready") {{
+						renderWorker.postMessage({{ type: "start" }});
+						return;
+					}}
+
+					console.log("volumetric: new render");
+
+					const {{ newHTML }} = ev.data;
+
+					if (newHTML != document.body.innerHTML) {{
+						document.body.innerHTML = newHTML;
+					}}
+				}};
+
+				renderWorker.onerror = function(error) {{
+					console.error('Worker error:', error);
+				}};
+
 				
-				volumetric.csr.clear_convd();
-				document.documentElement.innerHTML = update();
-				console.log("done2");
-				
-				// while (true) {{
-				//	
-				// }}
+				console.log("volumetric: worker ready");
+
+				renderWorker.postMessage({{
+					type: "init",
+					code
+				}});
+
+				console.log("volumetric: worker message posted");
 			}}
 
 			async function callconvd(name) {{

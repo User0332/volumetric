@@ -1,0 +1,1 @@
+PYODIDE_VERSION = "0.27.7"

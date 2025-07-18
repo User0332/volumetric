@@ -5,7 +5,7 @@ import dotenv
 from flask import Flask
 
 from volumetric.fs_routes import parse_fs_routes
-	
+
 class SecretsProxy:
 	def __getattr__(self, attr: str):
 		return os.environ[attr]
