@@ -1,15 +1,18 @@
 from js import *
 from pyjsx import jsx
-from volumetric.csr import convert_function
-from volumetric.xml_helpers import body
-
+from volumetric.csr import CSRHelpers, convert_function
 
 console.log("Hello, World! (from Python!)")
 
+def btn_handler():
+	window.alert("Hello!")
+
 def update():
-	return body(
+	csr = CSRHelpers()
+
+	return (
 		<>
 			<h1 id="heading">Hello, World!</h1>
-			<button onclick={convert_function(lambda: window.alert("Hello!"))}>Click Me!</button>
+			<button onclick={csr.conv_func(lambda: window.alert("Hello!"))}>Click Me!</button>
 		</>
 	)

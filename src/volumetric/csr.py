@@ -1,4 +1,6 @@
 import os
+import random
+import string
 from types import FunctionType
 
 from .constants import PYODIDE_VERSION
@@ -58,7 +60,7 @@ import pyjsx.auto_setup
 
 					const {{ newHTML }} = ev.data;
 
-					if (newHTML != document.body.innerHTML) {{
+					if (newHTML !== document.body.innerHTML) {{
 						document.body.innerHTML = newHTML;
 					}}
 				}};
@@ -99,7 +101,31 @@ convd_functions = {}
 def clear_convd():
 	convd_functions.clear()
 
-def convert_function(func: FunctionType) -> str:
-	convd_functions[repr(func)] = func
+def convert_function(ident: str, func: FunctionType) -> str:
+	convd_functions[ident] = func
 
-	return f"callconvd({repr(func)!r})"
+	return f"callconvd({ident!r})"
+
+class IdentGenerator:
+	def __init__(self, seed: int):
+		self.random = random.Random(seed)
+		self.seen = set()
+
+	def _gen(self):
+		return ''.join(self.random.choice(string.digits + string.ascii_letters) for _ in range(10))
+
+	def gen(self):
+		next_ident = self._gen()
+
+		if next_ident in self.seen: return self.gen()
+
+		self.seen.add(next_ident)
+		
+		return next_ident
+	
+class CSRHelpers:
+	def __init__(self, seed: int=123456789):
+		self.ident = IdentGenerator(seed)
+
+	def conv_func(self, func: FunctionType):
+		return convert_function(self.ident.gen(), func)

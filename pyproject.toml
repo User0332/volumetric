@@ -1,6 +1,6 @@
 [project]
 name = "volumetric-flask"
-version = "2.0.4"
+version = "4.1.0"
 description = "The Volumetric Python Web Framework"
 authors = [
     {name = "Carl Furtado",email = "carlzfurtado@gmail.com"}
