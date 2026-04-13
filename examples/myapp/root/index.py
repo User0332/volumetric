@@ -12,6 +12,7 @@ def handler(app: volumetric.App, *args):
 		<Content>
 			<h1 id="heading"></h1>
 			<h2 id="greeting">Hello, {request.args.get("name", "noname")}!</h2>
+			<button onclick="alert('js in xml in python!?!?!')">Hello World</button>
 		</Content>,
 		
 		head=<>

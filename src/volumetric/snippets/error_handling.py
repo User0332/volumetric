@@ -1,6 +1,6 @@
 # coding: jsx
 
-from typing import Any, Callable
+from typing import Callable
 
 from pyjsx import jsx, JSX
 

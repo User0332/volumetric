@@ -5,8 +5,12 @@ import json
 import sys
 from types import FunctionType
 from flask import Flask
+from typing import TYPE_CHECKING
 
-from volumetric import csr
+if TYPE_CHECKING:
+	from . import App
+
+from .csr import internal as csr_internals
 
 def appbind(func: FunctionType, app: Flask, name: str):
 	new = partial(func, app)
@@ -24,12 +28,12 @@ def modularize_index(path: str):
 	sys.path.remove(dirname)
 
 	return mod
-	
 
-def parse_fs_routes(app: Flask, rootdir: str, parent: str='/') -> bool:
+
+def parse_fs_routes(app: 'App', rootdir: str, parent: str='/') -> bool:
 	conf_fname = f"{rootdir}/config.json"
 	index_fname = f"{rootdir}/index.py"
-	
+
 	if os.path.exists(conf_fname):
 		with open(conf_fname, 'r') as f:
 			try: config: dict = json.load(f)
@@ -39,9 +43,10 @@ def parse_fs_routes(app: Flask, rootdir: str, parent: str='/') -> bool:
 	else: config = {}
 
 	if os.path.exists(index_fname):
-		if config.get("csr") is True:
-			handler = csr.route_to_view(open(index_fname).read(), parent)
+		if config.get("csr"):
 			del config["csr"]
+
+			handler = csr_internals.route_to_view(open(index_fname).read(), parent, app.use_local_volumetric_for_csr)
 		else:
 			try:
 				index = modularize_index(index_fname)
@@ -52,7 +57,7 @@ def parse_fs_routes(app: Flask, rootdir: str, parent: str='/') -> bool:
 			if not hasattr(index, "handler"):
 				print(f"{index_fname} is missing a handler function!")
 				return False
-			
+
 			handler = appbind(
 				index.handler,
 				app,
