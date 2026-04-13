@@ -1,4 +1,5 @@
 import asyncio
+import json
 import os
 from typing import Awaitable, Callable
 from pyodide import __version__ as PYODIDE_VERSION
@@ -22,14 +23,7 @@ volumetric.csr.render.start_render(update, volumetric.csr.state.STATE_CLASS)"""
 
 	frontend_code = frontend_header+code_wrapped+frontend_footer
 
-	py_residence_dir = f"static/_python{route}"
-
-	if not os.path.exists(py_residence_dir):
-		os.makedirs(py_residence_dir)
-
-	py_residence = os.path.join(py_residence_dir, "view.py")
-
-	open(py_residence, 'w').write(frontend_code)
+	js_safe_python_code = json.dumps(frontend_code)
 
 	frontend_html = f"""<!DOCTYPE html>
 <html>
@@ -46,9 +40,7 @@ volumetric.csr.render.start_render(update, volumetric.csr.state.STATE_CLASS)"""
 				
 				await pyodide.loadPackage("micropip")
 
-				const resource = await fetch("/{py_residence}");
-				const code = await resource.text();
-				const returnValue = await pyodide.runPythonAsync(code);
+				const returnValue = await pyodide.runPythonAsync({js_safe_python_code});
 			}}
 
 			async function callconvd(name) {{

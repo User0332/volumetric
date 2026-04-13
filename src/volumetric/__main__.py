@@ -133,6 +133,8 @@ def new(name: str, csr: bool):
 		open(f"{name}/root/index.py", 'w').write(
 			DEFAULT_CSR_ROUTE_CODE
 		)
+
+		os.mkdir(f"{name}/static/_python")
 	else:
 		open(f"{name}/config.json", 'w').write(
 			dumps(DEFAULT_SSR_CONF, indent='\t')
@@ -177,19 +179,6 @@ def route(path: str, csr: bool):
 		open(f"{route_path}/index.py", 'w').write(
 			DEFAULT_SSR_ROUTE_CODE
 		)
-
-def clean():
-	python_artifact_path = pathlib.Path("static/_python")
-
-	for item in python_artifact_path.iterdir():
-		if item.name.endswith(".whl"): continue # keep downloaded wheel files
-
-		if item.is_file():
-			item.unlink()
-		elif item.is_dir():
-			shutil.rmtree(item)
-
-	print("Removed generated handlers from static/_python/")
 
 def downloadwhl():
 	subprocess.run([sys.executable, "-m", "pip", "download", f"volumetric-flask=={VOLMETRIC_VERSION}", "--no-deps", "-d", "static/_python"], check=True)
@@ -239,11 +228,6 @@ def main():
 
 	run_parser.add_argument("--force-debug", action="store_true", help="make sure debug mode is used")
 
-	clean_parser = subparsers.add_parser(
-		"clean",
-		help="Clean Volumetric-generated runtime artifacts (such as static/_python/ files generated for CSR)"
-	)
-
 	downloadwhl_parser = subparsers.add_parser(
 		"downloadwhl",
 		help="Download the current version volumetric wheel via pip and place it in _python/ for use_local_volumetric CSR mode"
@@ -259,8 +243,6 @@ def main():
 		route(args.path, args.csr)
 	elif args.command == "new":
 		new(args.name, args.csr)
-	elif args.command == "clean":
-		clean()
 	elif args.command == "downloadwhl":
 		downloadwhl()
 	elif args.command == "run":
