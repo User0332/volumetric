@@ -1,13 +1,15 @@
 import importlib.metadata
-from typing import Any
 
 __version__ = importlib.metadata.version("volumetric_flask")
+
+import pyjsx.auto_setup
 
 import os
 import json
 import pathlib
 import dotenv
 from flask import Flask
+from typing import Any
 
 from volumetric.fs_routes import parse_fs_routes
 

@@ -1,6 +1,5 @@
 from flask import request
 from volumetric import App
-import pyjsx.auto_setup
 
 class PluginObjects:
 	authservice: 'AuthService'

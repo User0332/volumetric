@@ -1,6 +1,5 @@
 from volumetric import App
 from db import db
-import pyjsx.auto_setup
 
 app = App(__name__)
 
