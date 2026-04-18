@@ -13,6 +13,7 @@ from . import render as internal_render
 
 from js import document
 
+
 class IdentGenerator:
 	def __init__(self, seed: int):
 		self.random = random.Random(seed)

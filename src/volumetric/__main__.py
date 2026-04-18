@@ -1,6 +1,4 @@
 import os
-import pathlib
-import shutil
 import subprocess
 import sys
 from json import dumps
@@ -185,7 +183,7 @@ def downloadwhl():
 	print("Downloaded volumetric wheel to static/_python/")
 
 def main():
-	parser = ArgumentParser("volumetric", description="CLI for the Volumetric Python web framework (docs: https://DOCS_SUBDOMAIN.readthedocs.io/)")
+	parser = ArgumentParser("volumetric", description="CLI for the Volumetric Python web framework")
 
 	subparsers = parser.add_subparsers(dest="command", required=True, help="sub-command help")
 
@@ -235,7 +233,7 @@ def main():
 
 	args = parser.parse_args()
 
-	if not os.path.isfile("app.py") or not os.path.isfile("config.json") and args.command != "new":
+	if (not os.path.isfile("app.py") or not os.path.isfile("config.json")) and args.command != "new":
 		print("app.py or config.json not found! Make sure to run this command from the root of your Volumetric project.")
 		exit(1)
 

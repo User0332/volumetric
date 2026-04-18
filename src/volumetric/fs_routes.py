@@ -10,7 +10,12 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
 	from . import App
 
-from .csr import internal as csr_internals
+try: from .csr import internal as csr_internals
+except ModuleNotFoundError as e:
+	if  e.name == "pyodide":
+		pass # the [csr] extra wasn't installed
+	else:
+		raise e
 
 def appbind(func: FunctionType, app: Flask, name: str):
 	new = partial(func, app)

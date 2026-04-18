@@ -25,7 +25,7 @@ class FSRoutesManager:
 		if not parse_fs_routes(self.app, "root"):
 			exit(1)
 
-class App[TPluginObjectsModel, TSecretsModel](Flask):
+class App[TPluginObjectsModel, TSecretsModel = SecretsProxy](Flask):
 	def __init__(
 		self,
 		import_name: str,
@@ -56,7 +56,7 @@ class App[TPluginObjectsModel, TSecretsModel](Flask):
 		)
 
 		if secrets_path:
-			dotenv.load_dotenv(pathlib.Path(instance_path) / secrets_path)
+			dotenv.load_dotenv(pathlib.Path(self.instance_path) / secrets_path)
 
 			self.secrets: TSecretsModel = SecretsProxy()
 

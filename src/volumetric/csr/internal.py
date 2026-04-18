@@ -1,6 +1,5 @@
 import asyncio
 import json
-import os
 from typing import Awaitable, Callable
 from pyodide import __version__ as PYODIDE_VERSION
 from .. import __version__ as VOLMETRIC_VERSION

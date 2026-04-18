@@ -1,7 +1,6 @@
 from functools import partial
 from typing import Callable
 from pyjsx import JSX
-
 from .internal import clear_convd
 from .state import ViewState
 from js import document
