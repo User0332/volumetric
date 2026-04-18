@@ -7,12 +7,12 @@ from volumetric.snippets.conditionals import IfTruthy, NotTruthy
 from volumetric.snippets.error_handling import Try
 from volumetric.snippets.javascript import ClientSideRedirect
 from volumetric.xml_helpers import body
-from tests.myapp.annotations import User
+from annotations import User
 
 def handler(app: volumetric.App, *args):
-		
+
 	user: User = app.plugin_objects.authservice.get_user()
-	
+
 	return body(
 		<>
 			<IfTruthy valid={user}>
